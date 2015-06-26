@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A CardView that contains a TextView -->
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/add_card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    card_view:contentPadding="16dp"
+    card_view:cardElevation="0dp"
+    >
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter name"
+        android:id="@+id/addname"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addcity"
+        android:layout_below="@+id/addname"
+        android:layout_alignParentLeft="true"
+        android:hint="Enter city"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addemail"
+        android:layout_below="@+id/addcity"
+        android:layout_alignParentLeft="true"
+        android:hint="Enter email"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:id="@+id/button"
+        android:layout_below="@+id/addemail"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="29dp" />
+
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>
