@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        //navigation
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
         view.getMenu().getItem(2).setChecked(true); //by default select Users
         fragment = new ContentFragment();
