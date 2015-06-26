@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerLayout.openDrawer(GravityCompat.START);
 
+        //actionbar
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle("Users");
         toolbar.setTitleTextColor(Color.WHITE);
