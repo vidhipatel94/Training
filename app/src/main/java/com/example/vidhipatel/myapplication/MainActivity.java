@@ -3,9 +3,12 @@ package com.example.vidhipatel.myapplication;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,6 +16,7 @@ import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
@@ -67,14 +71,18 @@ public class MainActivity extends AppCompatActivity {
     User mUser;
     DatabaseHandler db;
     SwipeRefreshLayout mSwipeRefreshLayout;
-
+    NotificationCompat.Builder builder;
+    Boolean isTablet=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerLayout.openDrawer(GravityCompat.START);
+        if(drawerLayout==null)
+            isTablet=true;
+        if(!isTablet)
+            drawerLayout.openDrawer(GravityCompat.START);
 
         //actionbar
         toolbar=(Toolbar)findViewById(R.id.toolbar);
@@ -83,13 +91,15 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setVisibility(View.VISIBLE);
 
         //navigation button in actionbar
-        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
+        if(!isTablet) {
+            toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            });
+        }
 
         //navigation
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
@@ -119,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
                             fragmentTransaction.remove(fragment).commit();
                         }
                 }
-
-                drawerLayout.closeDrawers();
+                if(!isTablet)
+                    drawerLayout.closeDrawers();
 
                 return true;
             }
@@ -148,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.drawable.person);    //icon in status bar
     }
 
     @Override
@@ -256,8 +268,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 db.deleteUser(mUserList.get(position));
+                String s=mUserList.get(position).getName();
                 mUserList.remove(position);
                 adapter1.notifyDataSetChanged();
+
+               // This intent is fired when notification is clicked
+                //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, this.getIntent(), 0);
+                // Set the intent that will fire when the user taps the notification.
+                //builder.setContentIntent(pendingIntent);
+
+                builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp));
+                builder.setContentTitle("Users");
+                builder.setContentText("User: " + s + " is deleted");
+                builder.setTicker("User: " + s + " is deleted");
+                builder.setAutoCancel(true);
+                NotificationManager notificationManager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.notify(1,builder.build());
                 return true;
             }
         });
@@ -273,6 +299,21 @@ public class MainActivity extends AppCompatActivity {
         adapter1.notifyDataSetChanged();
         db.addUser(mUser);
         Toast.makeText(getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
+
+
+        // This intent is fired when notification is clicked
+        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, this.getIntent(), 0);
+        // Set the intent that will fire when the user taps the notification.
+        //builder.setContentIntent(pendingIntent);
+
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_add_white_24dp));
+        builder.setContentTitle("Users");
+        builder.setContentText("User is added");
+        builder.setTicker("User is added"); //to display in status bar
+        builder.setAutoCancel(true);    //remove notification after redirecting pending events
+        NotificationManager notificationManager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(0,builder.build());
+
     }
 
 }
