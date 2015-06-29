@@ -32,9 +32,7 @@ import retrofit.client.Response;
 
 
 public class UserListFragment extends Fragment {
-    //ListView lv;
     RecyclerView mRecyclerView;
-   // MyAdapterUser adapter1;
     MyRecyclerAdapter myRecyclerAdapter;
 
     List<User> mUserList;
@@ -59,7 +57,6 @@ public class UserListFragment extends Fragment {
         View v=inflater.inflate(R.layout.fragment_user_list, container, false);
         // Inflate the layout for this fragment
         mUserList = new ArrayList<User>();
-        //lv = (ListView) v.findViewById(R.id.list);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
 
@@ -85,6 +82,12 @@ public class UserListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        displayUser();
+    }
+
     private void loadUserData() {
         getActivity().deleteDatabase("userdb");
         db = new DatabaseHandler(getActivity());
@@ -96,10 +99,8 @@ public class UserListFragment extends Fragment {
         api.getUser(new Callback<List<User>>() {
             @Override
             public void success(List<User> users, Response response) {
-                // Log.i("JSON",users.get(0).getAddress());
                 for (int i = 0; i < users.size(); i++) {
                     mUser = users.get(i);
-                    //mUserList.add(mUser);
                     db.addUser(mUser);
                 }
                 displayUser();
@@ -109,61 +110,32 @@ public class UserListFragment extends Fragment {
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(fa.getApplicationContext(), "Connection error", Toast.LENGTH_LONG).show();
-             /*   mUser = new User();
-                mUser.setId(mUserList.size() + 1);
-                mUser.setName("Vidhi Patel");
-                mUser.setUsername("vidhi");
-                mUser.setEmail("vidhi@xyz.com");
-                mUserList.add(mUser);
-                db.addUser(mUser);
-
-                mUser = new User();
-                mUser.setId(mUserList.size() + 1);
-                mUser.setName("Radhi Patel");
-                mUser.setUsername("vidhi");
-                mUser.setEmail("vidhi@xyz.com");
-                mUserList.add(mUser);
-                db.addUser(mUser);
-                displayUser();
-                */
             }
         });
     }
 
     private void displayUser() {
         mUserList = db.getAllUsers();
-        /*adapter1 =
-                new MyAdapterUser(fa.getApplicationContext(), mUserList);
-        lv.setAdapter(adapter1);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        myRecyclerAdapter=new MyRecyclerAdapter(mUserList,R.layout.listviewlayout);
+        mRecyclerView.setAdapter(myRecyclerAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        myRecyclerAdapter.setOnItemClickListener(new MyRecyclerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                // ListView Clicked item value
-                //  User itemValue = (User) lv.getItemAtPosition(position);
-
+            public void onItemClick(View v, int position) {
                 Intent intent = new Intent(fa.getApplicationContext(), EmployeeInfo.class);
-                //intent.putExtra("User", itemValue);
                 intent.putExtra("User", position);
                 startActivity(intent);
-
             }
-
         });
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        myRecyclerAdapter.setOnItemLongClickListener(new MyRecyclerAdapter.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemLongClick(View v, int position) {
                 db.deleteUser(mUserList.get(position));
                 String s = mUserList.get(position).getName();
+                //adapter1.notifyDataSetChanged();
+                myRecyclerAdapter.remove(mUserList.get(position));
                 mUserList.remove(position);
-                adapter1.notifyDataSetChanged();
-
-                // This intent is fired when notification is clicked
-                //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, this.getIntent(), 0);
-                // Set the intent that will fire when the user taps the notification.
-                //builder.setContentIntent(pendingIntent);
 
                 builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp));
                 builder.setContentTitle("Users");
@@ -172,16 +144,9 @@ public class UserListFragment extends Fragment {
                 builder.setAutoCancel(true);
                 NotificationManager notificationManager = (NotificationManager) fa.getSystemService(fa.NOTIFICATION_SERVICE);
                 notificationManager.notify(1, builder.build());
-                return true;
+
             }
         });
-        */
-
-        myRecyclerAdapter=new MyRecyclerAdapter(mUserList,R.layout.listviewlayout);
-        mRecyclerView.setAdapter(myRecyclerAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
     }
 
@@ -196,12 +161,6 @@ public class UserListFragment extends Fragment {
         myRecyclerAdapter.add(mUser,mUserList.size());
         db.addUser(mUser);
         Toast.makeText(fa.getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
-
-
-        // This intent is fired when notification is clicked
-        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, this.getIntent(), 0);
-        // Set the intent that will fire when the user taps the notification.
-        //builder.setContentIntent(pendingIntent);
 
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_add_white_24dp));
         builder.setContentTitle("Users");

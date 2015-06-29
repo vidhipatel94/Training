@@ -1,10 +1,12 @@
 package com.example.vidhipatel.myapplication;
 
+import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,11 +16,13 @@ import java.util.Objects;
 /**
  * Created by vidhi.patel on 6/27/2015.
  */
-public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder> implements View.OnClickListener{
+public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder> {
 
     private List<User> items;
     private int itemLayout;
-    //private OnRecyclerViewItemClickListener<User> itemClickListener;
+    User e;
+    OnItemClickListener mOnItemClickListener;
+    OnItemLongClickListener mOnItemLongClickListener;
 
     public MyRecyclerAdapter(List<User> items,int itemLayout){
         this.items=items;
@@ -32,21 +36,26 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        User e=items.get(i);
+    public void onBindViewHolder(ViewHolder viewHolder, final int i) {
+        e=items.get(i);
         viewHolder.mTextviewName.setText(e.getName());
         viewHolder.mTextviewDesignation.setText(e.getUsername());
         viewHolder.mTextviewEmail.setText(e.getEmail());
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent = new Intent(fa.getApplicationContext(), EmployeeInfo.class);
-                //intent.putExtra("User", itemValue);
-                intent.putExtra("User", position);
-                startActivity(intent);
-                */
-                Object o=v.getTag();
-                Log.i("ITEM SELECTED",o.toString());
+                Log.i("CLICKED", i + "- " + items.get(i));
+                if (mOnItemClickListener != null)
+                    mOnItemClickListener.onItemClick(v, i);
+            }
+        });
+        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.i("DELETE", i + "- " + items.get(i));
+                if(mOnItemLongClickListener!=null)
+                    mOnItemLongClickListener.onItemLongClick(v,i);
+                return true;
             }
         });
     }
@@ -67,10 +76,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         notifyItemRemoved(position);
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView mTextviewName;
@@ -83,5 +88,20 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
             mTextviewDesignation = (TextView) itemView.findViewById(R.id.tv_designation);
             mTextviewEmail = (TextView) itemView.findViewById(R.id.tv_email);
         }
+    }
+    public interface OnItemClickListener{
+        public void onItemClick(View v,int position);
+    }
+
+    public void setOnItemClickListener(final OnItemClickListener onItemClickListener){
+        this.mOnItemClickListener=onItemClickListener;
+    }
+
+    public interface OnItemLongClickListener{
+        public void onItemLongClick(View v,int position);
+    }
+
+    public void setOnItemLongClickListener(final OnItemLongClickListener mOnItemLongClickListener){
+        this.mOnItemLongClickListener=mOnItemLongClickListener;
     }
 }
