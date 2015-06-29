@@ -2,6 +2,7 @@ package com.example.vidhipatel.myapplication;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     UserListFragment userListFragment;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     Boolean isTablet=false;
+    public static final String MY_FRAG="MY_FRAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
         fragment = new ContentFragment();
         userListFragment = new UserListFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, userListFragment).commit();
+        fragmentTransaction.replace(R.id.content_frame, userListFragment,MY_FRAG);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -114,20 +118,26 @@ public class MainActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
 
                     case R.id.navigation_home:
-                        if (fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.replace(R.id.content_frame, fragment).commit();
-                        }
-                        Toast.makeText(getApplicationContext(), menuItem.getTitle(), Toast.LENGTH_LONG).show();
-                        break;
+
                     case R.id.navigation_message:
-                        if (fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.replace(R.id.content_frame, fragment).commit();
+                        android.support.v4.app.Fragment myFragment1 =
+                                (android.support.v4.app.Fragment) getSupportFragmentManager().findFragmentByTag(MY_FRAG);
+                        if (myFragment1 != null && !myFragment1.equals(fragment)) {
+                            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(myFragment1.getId(), fragment,MY_FRAG);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                         }
                         Toast.makeText(getApplicationContext(), menuItem.getTitle(), Toast.LENGTH_LONG).show();
                         break;
                     default:
-                        if (fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.replace(R.id.content_frame, userListFragment).commit();
+                        android.support.v4.app.Fragment myFragment2 =
+                                (android.support.v4.app.Fragment) getSupportFragmentManager().findFragmentByTag(MY_FRAG);
+                        if (myFragment2 != null && !myFragment2.equals(userListFragment)) {
+                            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(myFragment2.getId(), userListFragment,MY_FRAG);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                         }
                 }
                 if (!isTablet)

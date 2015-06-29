@@ -59,6 +59,7 @@ public class UserListFragment extends Fragment {
 
     @OnClick(R.id.fab)
     void addUser() {
+        //AppCompat dialog view
         LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
         View view = layoutInflater.inflate(R.layout.add_user_dialog, null);
 
@@ -66,6 +67,7 @@ public class UserListFragment extends Fragment {
         final EditText addUsername = (EditText) view.findViewById(R.id.add_username);
         final EditText addEmail = (EditText) view.findViewById(R.id.add_email);
 
+        //create dialog
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
         builder.setTitle("Add User");
         builder.setView(view);
@@ -77,6 +79,7 @@ public class UserListFragment extends Fragment {
                 String email = String.valueOf(addEmail.getText());
                 if (!name.isEmpty() && !username.isEmpty() && !email.isEmpty()) {
                     if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        //create and add User
                         mUser = new User();
                         mUser.setId(mUserList.size() + 1);
                         mUser.setName(name);
