@@ -47,7 +47,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("CLICKED", i + "- " + items.get(i));
                 if (mOnItemClickListener != null)
                     mOnItemClickListener.onItemClick(v, i);
             }
@@ -55,7 +54,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Log.i("DELETE", i + "- " + items.get(i));
                 if(mOnItemLongClickListener!=null)
                     mOnItemLongClickListener.onItemLongClick(v,i);
                 return true;

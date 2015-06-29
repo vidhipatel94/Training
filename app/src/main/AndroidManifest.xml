@@ -35,11 +35,6 @@
             android:name=".EmployeeInfo"
             android:label="@string/title_activity_employee_info" >
         </activity>
-        <activity
-            android:name=".NevigationActivity"
-            android:label="@string/title_activity_nevigation"
-            android:theme="@style/NavigationViewTheme">
-        </activity>
     </application>
 
 </manifest>

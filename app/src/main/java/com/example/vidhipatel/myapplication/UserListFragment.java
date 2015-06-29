@@ -2,6 +2,7 @@ package com.example.vidhipatel.myapplication;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -11,14 +12,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,39 +38,76 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import android.support.v7.app.AlertDialog;
+
 
 public class UserListFragment extends Fragment {
-    @Bind(R.id.list) RecyclerView mRecyclerView;
+    @Bind(R.id.list)
+    RecyclerView mRecyclerView;
     MyRecyclerAdapter myRecyclerAdapter;
 
     List<User> mUserList;
     User mUser;
     DatabaseHandler db;
-    @Bind(R.id.activity_main_swipe_refresh_layout)SwipeRefreshLayout mSwipeRefreshLayout;
-    @Bind(R.id.fab) FloatingActionButton fab;
+    @Bind(R.id.activity_main_swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
     NotificationCompat.Builder builder;
     FragmentActivity fa;
+    public static final String API_URL = "http://jsonplaceholder.typicode.com";
 
     @OnClick(R.id.fab)
     void addUser() {
-        mUser = new User();
-        mUser.setId(mUserList.size() + 1);
-        mUser.setName("Vidhi Patel");
-        mUser.setUsername("vidhi");
-        mUser.setEmail("vidhi@xyz.com");
-        myRecyclerAdapter.add(mUser,mUserList.size());
-        db.addUser(mUser);
-        Toast.makeText(fa.getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
+        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+        View view = layoutInflater.inflate(R.layout.add_user_dialog, null);
 
+        final EditText addName = (EditText) view.findViewById(R.id.add_name);
+        final EditText addUsername = (EditText) view.findViewById(R.id.add_username);
+        final EditText addEmail = (EditText) view.findViewById(R.id.add_email);
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        builder.setTitle("Add User");
+        builder.setView(view);
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String name = String.valueOf(addName.getText());
+                String username = String.valueOf(addUsername.getText());
+                String email = String.valueOf(addEmail.getText());
+                if (!name.isEmpty() && !username.isEmpty() && !email.isEmpty()) {
+                    if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        mUser = new User();
+                        mUser.setId(mUserList.size() + 1);
+                        mUser.setName(name);
+                        mUser.setUsername(username);
+                        mUser.setEmail(email);
+                        myRecyclerAdapter.add(mUser, mUserList.size());
+                        db.addUser(mUser);
+
+                        notifyUserAdded();
+                    } else
+                        Toast.makeText(getActivity(), "Invalid user email", Toast.LENGTH_LONG).show();
+                } else
+                    Toast.makeText(getActivity(), "Incomplete user information", Toast.LENGTH_LONG).show();
+
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+
+    }
+
+    private void notifyUserAdded() {
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_add_white_24dp));
         builder.setContentTitle("Users");
         builder.setContentText("User is added");
         builder.setTicker("User is added"); //to display in status bar
         builder.setAutoCancel(true);    //remove notification after redirecting pending events
-        NotificationManager notificationManager=(NotificationManager)fa.getSystemService(fa.NOTIFICATION_SERVICE);
-        notificationManager.notify(0,builder.build());
-
+        NotificationManager notificationManager = (NotificationManager) fa.getSystemService(fa.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, builder.build());
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,9 +117,9 @@ public class UserListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fa=super.getActivity();
-        View v=inflater.inflate(R.layout.fragment_user_list, container, false);
-        ButterKnife.bind(this,v);
+        fa = super.getActivity();
+        View v = inflater.inflate(R.layout.fragment_user_list, container, false);
+        ButterKnife.bind(this, v);
 
         // Inflate the layout for this fragment
         mUserList = new ArrayList<User>();
@@ -102,11 +144,11 @@ public class UserListFragment extends Fragment {
     }
 
     private void loadUserData() {
-        getActivity().deleteDatabase("userdb");
+        getActivity().deleteDatabase(DatabaseHandler.DB_NAME);
         db = new DatabaseHandler(getActivity());
 
         Api api = new RestAdapter.Builder()
-                .setEndpoint("http://jsonplaceholder.typicode.com")
+                .setEndpoint(API_URL)
                 .build()
                 .create(Api.class);
         api.getUser(new Callback<List<User>>() {
@@ -129,7 +171,7 @@ public class UserListFragment extends Fragment {
 
     private void displayUser() {
         mUserList = db.getAllUsers();
-        myRecyclerAdapter=new MyRecyclerAdapter(mUserList,R.layout.listviewlayout);
+        myRecyclerAdapter = new MyRecyclerAdapter(mUserList, R.layout.listviewlayout);
         mRecyclerView.setAdapter(myRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -145,25 +187,25 @@ public class UserListFragment extends Fragment {
             @Override
             public void onItemLongClick(View v, int position) {
                 db.deleteUser(mUserList.get(position));
-                String s = mUserList.get(position).getName();
+                String userName = mUserList.get(position).getName();
                 myRecyclerAdapter.remove(mUserList.get(position));
 
-                builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp));
-                builder.setContentTitle("Users");
-                builder.setContentText("User: " + s + " is deleted");
-                builder.setTicker("User: " + s + " is deleted");
-                builder.setAutoCancel(true);
-                NotificationManager notificationManager = (NotificationManager) fa.getSystemService(fa.NOTIFICATION_SERVICE);
-                notificationManager.notify(1, builder.build());
+                notifyUserDeleted(userName);
 
             }
         });
 
     }
 
-
-
-
+    private void notifyUserDeleted(String userName) {
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp));
+        builder.setContentTitle("Users");
+        builder.setContentText("User: " + userName + " is deleted");
+        builder.setTicker("User: " + userName + " is deleted");
+        builder.setAutoCancel(true);
+        NotificationManager notificationManager = (NotificationManager) fa.getSystemService(fa.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
 
 
 }

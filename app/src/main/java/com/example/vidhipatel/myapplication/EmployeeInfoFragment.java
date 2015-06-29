@@ -21,13 +21,16 @@ public class EmployeeInfoFragment extends Fragment {
     @Bind(R.id.empname) TextView textView;
     @Bind(R.id.empdesignation) TextView textView2;
     @Bind(R.id.empemail) TextView textView3;
+    public static String NAME="NAME";
+    public static String USERNAME="USERNAME";
+    public static String EMAIL="EMAIL";
 
     public static EmployeeInfoFragment newInstance(User mUser) {
         EmployeeInfoFragment fragment = new EmployeeInfoFragment();
         Bundle args = new Bundle();
-        args.putString("NAME", mUser.getName());
-        args.putString("USERNAME", mUser.getUsername());
-        args.putString("EMAIL", mUser.getEmail());
+        args.putString(NAME, mUser.getName());
+        args.putString(USERNAME, mUser.getUsername());
+        args.putString(EMAIL, mUser.getEmail());
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,9 +42,9 @@ public class EmployeeInfoFragment extends Fragment {
         View v=inflater.inflate(R.layout.fragment_employee_info, container, false);
         ButterKnife.bind(this,v);
 
-        textView.setText(getArguments().getString("NAME"));
-        textView2.setText(getArguments().getString("USERNAME"));
-        textView3.setText(getArguments().getString("EMAIL"));
+        textView.setText(getArguments().getString(NAME));
+        textView2.setText(getArguments().getString(USERNAME));
+        textView3.setText(getArguments().getString(EMAIL));
 
         return v;
     }
