@@ -56,6 +56,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -63,26 +66,25 @@ import retrofit.client.Response;
 
 
 public class MainActivity extends AppCompatActivity {
-    DrawerLayout drawerLayout;
-    Toolbar toolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @Bind(R.id.toolbar) Toolbar toolbar;
     ContentFragment fragment;
     UserListFragment userListFragment;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-
     Boolean isTablet=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if(drawerLayout==null)
             isTablet=true;
         if(!isTablet)
             drawerLayout.openDrawer(GravityCompat.START);
 
         //actionbar
-        toolbar=(Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle("Users");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setVisibility(View.VISIBLE);

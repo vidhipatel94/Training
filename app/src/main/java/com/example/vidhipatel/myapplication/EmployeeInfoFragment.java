@@ -12,15 +12,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 public class EmployeeInfoFragment extends Fragment {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     */
-    // TODO: Rename and change types and number of parameters
+    @Bind(R.id.empname) TextView textView;
+    @Bind(R.id.empdesignation) TextView textView2;
+    @Bind(R.id.empemail) TextView textView3;
+
     public static EmployeeInfoFragment newInstance(User mUser) {
         EmployeeInfoFragment fragment = new EmployeeInfoFragment();
         Bundle args = new Bundle();
@@ -36,9 +37,7 @@ public class EmployeeInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v=inflater.inflate(R.layout.fragment_employee_info, container, false);
-        TextView textView = (TextView) v.findViewById(R.id.empname);
-        TextView textView2 = (TextView) v.findViewById(R.id.empdesignation);
-        TextView textView3 = (TextView) v.findViewById(R.id.empemail);
+        ButterKnife.bind(this,v);
 
         textView.setText(getArguments().getString("NAME"));
         textView2.setText(getArguments().getString("USERNAME"));

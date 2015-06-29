@@ -13,6 +13,9 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Objects;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by vidhi.patel on 6/27/2015.
  */
@@ -78,15 +81,14 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView mTextviewName;
-        private TextView mTextviewDesignation;
-        private TextView mTextviewEmail;
+        @Bind(R.id.tv_name) TextView mTextviewName;
+        @Bind(R.id.tv_designation) TextView mTextviewDesignation;
+        @Bind(R.id.tv_email) TextView mTextviewEmail;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mTextviewName = (TextView) itemView.findViewById(R.id.tv_name);
-            mTextviewDesignation = (TextView) itemView.findViewById(R.id.tv_designation);
-            mTextviewEmail = (TextView) itemView.findViewById(R.id.tv_email);
+            ButterKnife.bind(this,itemView);
+
         }
     }
     public interface OnItemClickListener{

@@ -16,17 +16,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 public class NevigationActivity extends AppCompatActivity {
-    DrawerLayout drawerLayout;
-    Toolbar toolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @Bind(R.id.toolbar)Toolbar toolbar;
+    @Bind(R.id.navigation_view) NavigationView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nevigation);
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ButterKnife.bind(this);
         drawerLayout.openDrawer(GravityCompat.START);
 
         toolbar=(Toolbar)findViewById(R.id.toolbar);
@@ -44,7 +47,7 @@ public class NevigationActivity extends AppCompatActivity {
         });
 
 
-        NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
+        view = (NavigationView) findViewById(R.id.navigation_view);
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {

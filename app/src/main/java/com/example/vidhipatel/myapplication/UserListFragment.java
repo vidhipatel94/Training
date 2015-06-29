@@ -25,6 +25,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -32,18 +35,37 @@ import retrofit.client.Response;
 
 
 public class UserListFragment extends Fragment {
-    RecyclerView mRecyclerView;
+    @Bind(R.id.list) RecyclerView mRecyclerView;
     MyRecyclerAdapter myRecyclerAdapter;
 
     List<User> mUserList;
     User mUser;
     DatabaseHandler db;
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    FloatingActionButton fab;
+    @Bind(R.id.activity_main_swipe_refresh_layout)SwipeRefreshLayout mSwipeRefreshLayout;
+    @Bind(R.id.fab) FloatingActionButton fab;
     NotificationCompat.Builder builder;
-
     FragmentActivity fa;
 
+    @OnClick(R.id.fab)
+    void addUser() {
+        mUser = new User();
+        mUser.setId(mUserList.size() + 1);
+        mUser.setName("Vidhi Patel");
+        mUser.setUsername("vidhi");
+        mUser.setEmail("vidhi@xyz.com");
+        myRecyclerAdapter.add(mUser,mUserList.size());
+        db.addUser(mUser);
+        Toast.makeText(fa.getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
+
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_add_white_24dp));
+        builder.setContentTitle("Users");
+        builder.setContentText("User is added");
+        builder.setTicker("User is added"); //to display in status bar
+        builder.setAutoCancel(true);    //remove notification after redirecting pending events
+        NotificationManager notificationManager=(NotificationManager)fa.getSystemService(fa.NOTIFICATION_SERVICE);
+        notificationManager.notify(0,builder.build());
+
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +77,11 @@ public class UserListFragment extends Fragment {
                              Bundle savedInstanceState) {
         fa=super.getActivity();
         View v=inflater.inflate(R.layout.fragment_user_list, container, false);
+        ButterKnife.bind(this,v);
+
         // Inflate the layout for this fragment
         mUserList = new ArrayList<User>();
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.activity_main_swipe_refresh_layout);
-        fab = (FloatingActionButton) v.findViewById(R.id.fab);
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.accent_material_light);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -70,13 +90,6 @@ public class UserListFragment extends Fragment {
                 loadUserData();
             }
         });
-       fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addUser();
-            }
-        });
-
         builder = new NotificationCompat.Builder(fa.getApplicationContext());
         builder.setSmallIcon(R.drawable.person);    //icon in status bar
         return v;
@@ -134,7 +147,6 @@ public class UserListFragment extends Fragment {
                 db.deleteUser(mUserList.get(position));
                 String s = mUserList.get(position).getName();
                 myRecyclerAdapter.remove(mUserList.get(position));
-                mUserList.remove(position);
 
                 builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp));
                 builder.setContentTitle("Users");
@@ -149,25 +161,7 @@ public class UserListFragment extends Fragment {
 
     }
 
-    private void addUser() {
-        mUser = new User();
-        mUser.setId(mUserList.size() + 1);
-        mUser.setName("Vidhi Patel");
-        mUser.setUsername("vidhi");
-        mUser.setEmail("vidhi@xyz.com");
-        myRecyclerAdapter.add(mUser,mUserList.size());
-        db.addUser(mUser);
-        Toast.makeText(fa.getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
 
-        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_add_white_24dp));
-        builder.setContentTitle("Users");
-        builder.setContentText("User is added");
-        builder.setTicker("User is added"); //to display in status bar
-        builder.setAutoCancel(true);    //remove notification after redirecting pending events
-        NotificationManager notificationManager=(NotificationManager)fa.getSystemService(fa.NOTIFICATION_SERVICE);
-        notificationManager.notify(0,builder.build());
-
-    }
 
 
 
