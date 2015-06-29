@@ -48,7 +48,6 @@ public class EmployeeInfo extends AppCompatActivity {
         //Back button in actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //User mUser = (User) getIntent().getSerializableExtra("User");
         db = new DatabaseHandler(this);
         mUserList = db.getAllUsers();
         int pos = getIntent().getExtras().getInt("User");
@@ -58,7 +57,6 @@ public class EmployeeInfo extends AppCompatActivity {
         viewPager.setAdapter(pageAdapter);
         viewPager.setCurrentItem(pos);
 
-  //      setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);    //MODE_SCROLLABLE=0
@@ -83,7 +81,6 @@ public class EmployeeInfo extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.delete) {
             currentUserIndex = viewPager.getCurrentItem();
-            // Log.i("DELETE", currentUserIndex + "- " + mUserList.get(currentUserIndex).getName());
             db.deleteUser(mUserList.get(currentUserIndex));
             mUserList.remove(currentUserIndex);
             pageAdapter.notifyDataSetChanged();
@@ -106,8 +103,6 @@ public class EmployeeInfo extends AppCompatActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            //Log.i("POSITION", (position) + "- " + mUserList.get(position).getName());
-           // return mFragmentList.get(position);
             return EmployeeInfoFragment.newInstance(mUserList.get(position));
         }
 

@@ -44,13 +44,7 @@ public class EmployeeInfoFragment extends Fragment {
         textView2.setText(getArguments().getString("USERNAME"));
         textView3.setText(getArguments().getString("EMAIL"));
 
-    /*    ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
-
-        int imageWidth = bitmap.getWidth();
-        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, 800, true);
-        imageView.setImageBitmap(bitmap);
-    */    return v;
+        return v;
     }
 
 

@@ -133,7 +133,6 @@ public class UserListFragment extends Fragment {
             public void onItemLongClick(View v, int position) {
                 db.deleteUser(mUserList.get(position));
                 String s = mUserList.get(position).getName();
-                //adapter1.notifyDataSetChanged();
                 myRecyclerAdapter.remove(mUserList.get(position));
                 mUserList.remove(position);
 
@@ -156,8 +155,6 @@ public class UserListFragment extends Fragment {
         mUser.setName("Vidhi Patel");
         mUser.setUsername("vidhi");
         mUser.setEmail("vidhi@xyz.com");
-        //mUserList.add(mUser);
-        //adapter1.notifyDataSetChanged();
         myRecyclerAdapter.add(mUser,mUserList.size());
         db.addUser(mUser);
         Toast.makeText(fa.getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();

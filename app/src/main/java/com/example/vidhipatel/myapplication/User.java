@@ -10,7 +10,6 @@ public class User implements Serializable{
     String name;
     String username;
     String email;
-    //String address;
 
     void setId(int id){
         this.id=id;
@@ -27,9 +26,7 @@ public class User implements Serializable{
     void setEmail(String email){
         this.email=email;
     }
-   /* void setAddress(String address){
-        this.address=address;
-    }*/
+
 
     int getId(){
         return this.id;
@@ -46,7 +43,5 @@ public class User implements Serializable{
     String getEmail(){
         return this.email;
     }
-    /*String getAddress(){
-        return this.address;
-    }*/
+
 }

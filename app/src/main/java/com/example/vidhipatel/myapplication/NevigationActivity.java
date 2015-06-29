@@ -48,7 +48,6 @@ public class NevigationActivity extends AppCompatActivity {
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-               // Snackbar.make(content, menuItem.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
                 menuItem.setChecked(true);
                 Toast.makeText(getApplicationContext(), menuItem.getTitle(),Toast.LENGTH_LONG).show();
                 if(menuItem.getTitle().toString().equals("Users")){
@@ -80,12 +79,6 @@ public class NevigationActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
-        /*if(id == android.R.id.home) {
-            drawerLayout.openDrawer(GravityCompat.START);
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 }
