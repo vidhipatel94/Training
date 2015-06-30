@@ -1,11 +1,14 @@
 package com.example.vidhipatel.myapplication;
 
+import android.graphics.Color;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -21,7 +24,9 @@ public class EmployeeInfo extends AppCompatActivity {
     DatabaseHandler db;
     int currentUserIndex = 0;
     List<User> mUserList;
+    @Bind(R.id.empinfo_toolbar) Toolbar toolbar;
     @Bind(R.id.tabs) TabLayout tabLayout;
+    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +34,13 @@ public class EmployeeInfo extends AppCompatActivity {
         setContentView(R.layout.activity_employee_info);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
         //Back button in actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        collapsingToolbarLayout.setTitle("User Info");
+        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
+        collapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
 
         db = new DatabaseHandler(this);
         mUserList = db.getAllUsers();

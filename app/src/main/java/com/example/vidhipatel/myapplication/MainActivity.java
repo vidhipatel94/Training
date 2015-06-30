@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
         if(drawerLayout==null)
             isTablet=true;
-        if(!isTablet)
-            drawerLayout.openDrawer(GravityCompat.START);
 
         //actionbar
         toolbar.setTitle("Users");

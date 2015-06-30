@@ -33,7 +33,8 @@
         </activity>
         <activity
             android:name=".EmployeeInfo"
-            android:label="@string/title_activity_employee_info" >
+            android:label="@string/title_activity_employee_info"
+            android:theme="@style/NavigationViewTheme">
         </activity>
     </application>
 
