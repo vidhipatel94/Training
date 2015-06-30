@@ -15,7 +15,7 @@ import java.util.List;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final int DB_VERSION = 1;
-    public static final String DB_NAME = "userdb";
+    static final String DB_NAME = "userdb";
     private static final String TB_NAME = "users";
 
     private static final String ID = "id";
@@ -24,17 +24,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String EMAIL = "email";
 
     public DatabaseHandler(Context context) {
-        super(context,DB_NAME, null, DB_VERSION);
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE "+TB_NAME+"("+ID+" INTEGER PRIMARY KEY,"+NAME+" TEXT,"+USERNAME+" TEXT,"+EMAIL+" TEXT)");
+        db.execSQL("CREATE TABLE " + TB_NAME + "(" + ID + " INTEGER PRIMARY KEY," + NAME + " TEXT," + USERNAME + " TEXT," + EMAIL + " TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+TB_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TB_NAME);
         onCreate(db);
     }
 
@@ -57,7 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Getting All Contacts
-    public List<User> getAllUsers() {
+    List<User> getAllUsers() {
         List<User> userList = new ArrayList<User>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TB_NAME;
@@ -68,11 +68,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                User user = new User();
-                user.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ID))));
-                user.setName(cursor.getString(cursor.getColumnIndex(NAME)));
-                user.setUsername(cursor.getString(cursor.getColumnIndex(USERNAME)));
-                user.setEmail(cursor.getString(cursor.getColumnIndex(EMAIL)));
+                User user =
+                        new User(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ID))),
+                                cursor.getString(cursor.getColumnIndex(NAME)),
+                                cursor.getString(cursor.getColumnIndex(USERNAME)),
+                                cursor.getString(cursor.getColumnIndex(EMAIL)));
                 // Adding contact to list
                 userList.add(user);
             } while (cursor.moveToNext());
@@ -83,10 +83,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single contact
-    public void deleteUser(User user) {
+    void deleteUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TB_NAME, ID + " = ?",
-                new String[] { String.valueOf(user.getId()) });
+                new String[]{String.valueOf(user.getId())});
         db.close();
     }
 

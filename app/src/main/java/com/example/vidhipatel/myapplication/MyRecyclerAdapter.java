@@ -66,42 +66,43 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         return items.size();
     }
 
-    public void add(User item, int position){
+    void add(User item, int position){
         items.add(item);
         notifyItemInserted(position);
     }
 
-    public void remove(User item){
+    void remove(User item){
         int position=items.indexOf(item);
         items.remove(position);
         notifyItemRemoved(position);
     }
 
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    //If you declare a member class that does not require access to an enclosing
+    // instance, always put the static modifier in its declaration,
+    static class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_name) TextView mTextviewName;
         @Bind(R.id.tv_designation) TextView mTextviewDesignation;
         @Bind(R.id.tv_email) TextView mTextviewEmail;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
 
         }
     }
-    public interface OnItemClickListener{
+    interface OnItemClickListener{
         public void onItemClick(View v,int position);
     }
 
-    public void setOnItemClickListener(final OnItemClickListener onItemClickListener){
+    void setOnItemClickListener(final OnItemClickListener onItemClickListener){
         this.mOnItemClickListener=onItemClickListener;
     }
 
-    public interface OnItemLongClickListener{
+    interface OnItemLongClickListener{
         public void onItemLongClick(View v,int position);
     }
 
-    public void setOnItemLongClickListener(final OnItemLongClickListener mOnItemLongClickListener){
+    void setOnItemLongClickListener(final OnItemLongClickListener mOnItemLongClickListener){
         this.mOnItemLongClickListener=mOnItemLongClickListener;
     }
 }

@@ -77,7 +77,7 @@ public class EmployeeInfo extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class MyPageAdapter extends FragmentStatePagerAdapter {
+    class MyPageAdapter extends FragmentStatePagerAdapter {
 
         public MyPageAdapter(FragmentManager fm) {
             super(fm);

@@ -5,29 +5,22 @@ import java.io.Serializable;
 /**
  * Created by vidhi.patel on 6/19/2015.
  */
+//package-protected
 public class User implements Serializable{
-    int id;
-    String name;
-    String username;
-    String email;
+    private int id;
+    private String name;
+    private String username;
+    private String email;
 
-    void setId(int id){
+    //package-protected
+    User(int id, String name, String username, String email){
         this.id=id;
-    }
-
-    void setName(String name){
         this.name=name;
-    }
-
-    void setUsername(String username){
         this.username=username;
-    }
-
-    void setEmail(String email){
         this.email=email;
     }
 
-
+    //accessors without mutators
     int getId(){
         return this.id;
     }

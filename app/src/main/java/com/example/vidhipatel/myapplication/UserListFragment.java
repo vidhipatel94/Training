@@ -80,11 +80,7 @@ public class UserListFragment extends Fragment {
                 if (!name.isEmpty() && !username.isEmpty() && !email.isEmpty()) {
                     if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                         //create and add User
-                        mUser = new User();
-                        mUser.setId(mUserList.size() + 1);
-                        mUser.setName(name);
-                        mUser.setUsername(username);
-                        mUser.setEmail(email);
+                        mUser = new User(mUserList.size() + 1, name, username, email);
                         myRecyclerAdapter.add(mUser, mUserList.size());
                         db.addUser(mUser);
 
