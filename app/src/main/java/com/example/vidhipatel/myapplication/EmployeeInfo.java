@@ -87,8 +87,21 @@ public class EmployeeInfo extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        viewPager=null;
+        pageAdapter=null;
+        db=null;
+        mUserList=null;
+        toolbar=null;
+        tabLayout=null;
+        collapsingToolbarLayout=null;
+        finish();
 
-    class MyPageAdapter extends FragmentStatePagerAdapter {
+    }
+
+        class MyPageAdapter extends FragmentStatePagerAdapter {
 
         public MyPageAdapter(FragmentManager fm) {
             super(fm);
