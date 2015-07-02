@@ -121,7 +121,7 @@ public class UserListFragment extends Fragment {
         ButterKnife.bind(this, v);
 
         // Inflate the layout for this fragment
-        mUserList = new ArrayList<User>();
+        mUserList = new MyList<User>();
         mRecyclerView.setHasFixedSize(true);
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.accent_material_light);

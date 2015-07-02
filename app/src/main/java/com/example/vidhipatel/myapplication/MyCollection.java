@@ -28,7 +28,7 @@ public class MyCollection<E> implements Collection<E> {
         return true;
     }
 
-    private void extendArray() {
+    void extendArray() {
         E[] collection2= (E[]) new Object[collection.length+SIZE];
         System.arraycopy(collection,0,collection2,0,collection.length);
         collection=collection2;
@@ -95,7 +95,12 @@ public class MyCollection<E> implements Collection<E> {
 
             @Override
             public void remove() {
-
+                if(hasNext()){
+                    //shift
+                    for(int j=index-1;j<size()-1;j++)
+                        collection[j]=collection[j+1];
+                }
+                collection[toc--]=null;
             }
         };
         return iterator;

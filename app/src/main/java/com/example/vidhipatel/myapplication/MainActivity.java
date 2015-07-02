@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         fragment = new ContentFragment();
         userListFragment = new UserListFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, userListFragment,MY_FRAG);
+        fragmentTransaction.replace(R.id.content_frame, userListFragment, MY_FRAG);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -102,11 +104,84 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        stackusage();
-        Log.i("Collection", "--------------------");
-        collectionusage();
+        //stackusage();
+       // Log.i("Collection", "--------------------");
+        //collectionusage();
+        Log.i("List", "------------------------------");
+        listusage();
 
     }
+
+    private void listusage() {
+        MyList<String> list=new MyList<String>();
+        list.add("AA");
+        Log.i("SIZE", list.size() + "");
+        Log.i("0:", list.get(0));
+        //add
+        list.add(1, "BB");
+        Log.i("SIZE", list.size() + "");
+        Log.i("1:", list.get(1));
+        list.add(1, "CC");
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("SIZE", list.size() + "");
+
+        MyCollection<String> myCollection=new MyCollection<String>();
+        myCollection.add("11");
+        myCollection.add("22");
+
+        //addAll
+        list.addAll(1, myCollection);
+        Log.i("SIZE", list.size() + "");
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("3:", list.get(3));
+
+        //index
+        list.add("CC");
+        Log.i("Index:CC", list.indexOf("CC") + "");
+        Log.i("LastIndex:CC", list.lastIndexOf("CC") + "");
+
+        //remove
+        Log.i("SIZE", list.size() + "");
+        list.remove(2);
+        Log.i("SIZE", list.size() + "");
+        Log.i("0:", list.get(0));
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("3:", list.get(3));
+        Log.i("4:", list.get(4));
+
+        //set
+        list.set(1, "VV");
+        Log.i("1:", list.get(1));
+
+        //sublist
+        List<String> sublist=list.subList(1,4);
+        for(int i=0;i<sublist.size();i++)
+            Log.i(i+":",sublist.get(i));
+
+        //iterator
+        ListIterator<String> iterator= list.listIterator();
+        while(iterator.hasNext()){
+            String s=iterator.next();
+            if(s=="VV")
+                iterator.set("11");
+
+            Log.i("ELE-N",s);
+        }
+        while(iterator.hasPrevious())
+            Log.i("ELE-P",iterator.previous());
+
+        iterator= list.listIterator(1);
+        while(iterator.hasNext()){
+            Log.i("ELE-N",iterator.next());
+        }
+        while(iterator.hasPrevious())
+            Log.i("ELE-P",iterator.previous());
+
+    }
+
 
     private void collectionusage() {
         MyCollection<String> myCollection = new MyCollection<String>();
@@ -143,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //retainAll
-        Log.i("C","----------");
+        Log.i("C", "----------");
         myCollection.add("CC");
         iterator= (Iterator<String>) myCollection.iterator();
         while(iterator.hasNext()){
