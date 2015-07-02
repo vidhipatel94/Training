@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         userListFragment = new UserListFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, userListFragment, MY_FRAG);
-        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -107,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         //stackusage();
        // Log.i("Collection", "--------------------");
         //collectionusage();
-        Log.i("List", "------------------------------");
-        listusage();
+        //Log.i("List", "------------------------------");
+       // listusage();
 
     }
 

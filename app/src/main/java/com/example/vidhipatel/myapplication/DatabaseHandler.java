@@ -23,8 +23,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String USERNAME = "username";
     private static final String EMAIL = "email";
 
+    SQLiteDatabase db;
+
     public DatabaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        db = this.getWritableDatabase();
     }
 
     @Override
@@ -44,7 +47,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Adding new contact
     void addUser(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(NAME, user.getName());
@@ -53,7 +55,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Inserting Row
         db.insert(TB_NAME, null, values);
-        db.close(); // Closing database connection
     }
 
     // Getting All Contacts
@@ -62,7 +63,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TB_NAME;
 
-        SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -84,10 +84,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Deleting single contact
     void deleteUser(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TB_NAME, ID + " = ?",
                 new String[]{String.valueOf(user.getId())});
-        db.close();
+
     }
 
+    void deleteAllUsers(){
+        db.delete(TB_NAME,null,null);
+    }
 }

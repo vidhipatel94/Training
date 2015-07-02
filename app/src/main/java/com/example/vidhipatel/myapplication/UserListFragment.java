@@ -47,7 +47,6 @@ public class UserListFragment extends Fragment {
     MyRecyclerAdapter myRecyclerAdapter;
 
     List<User> mUserList;
-    User mUser;
     DatabaseHandler db;
     @Bind(R.id.activity_main_swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -56,7 +55,8 @@ public class UserListFragment extends Fragment {
     NotificationCompat.Builder builder;
     FragmentActivity fa;
     public static final String API_URL = "http://jsonplaceholder.typicode.com";
-
+    public static final int REQUEST_CODE=05;
+    public static final int RESULT_OK=-1;
     @OnClick(R.id.fab)
     void addUser() {
         //AppCompat dialog view
@@ -80,7 +80,7 @@ public class UserListFragment extends Fragment {
                 if (!name.isEmpty() && !username.isEmpty() && !email.isEmpty()) {
                     if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                         //create and add User
-                        mUser = new User(mUserList.size() + 1, name, username, email);
+                        User mUser = new User(mUserList.size() + 1, name, username, email);
                         myRecyclerAdapter.add(mUser, mUserList.size());
                         db.addUser(mUser);
 
@@ -110,6 +110,28 @@ public class UserListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = new DatabaseHandler(getActivity());
+        mUserList = new ArrayList<User>();
+        myRecyclerAdapter = new MyRecyclerAdapter(mUserList, R.layout.listviewlayout);
+        myRecyclerAdapter.setOnItemClickListener(new MyRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Intent intent = new Intent(fa.getApplicationContext(), EmployeeInfo.class);
+                intent.putExtra("User", position);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
+        myRecyclerAdapter.setOnItemLongClickListener(new MyRecyclerAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View v, int position) {
+                db.deleteUser(mUserList.get(position));
+                String userName = mUserList.get(position).getName();
+                myRecyclerAdapter.remove(mUserList.get(position));
+                myRecyclerAdapter.notifyDataSetChanged();
+                notifyUserDeleted(userName);
+
+            }
+        });
         loadUserData();
     }
 
@@ -120,8 +142,6 @@ public class UserListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_user_list, container, false);
         ButterKnife.bind(this, v);
 
-        // Inflate the layout for this fragment
-        mUserList = new MyList<User>();
         mRecyclerView.setHasFixedSize(true);
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.accent_material_light);
@@ -133,19 +153,15 @@ public class UserListFragment extends Fragment {
         });
         builder = new NotificationCompat.Builder(fa.getApplicationContext());
         builder.setSmallIcon(R.drawable.person);    //icon in status bar
+
+        displayUser();
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        displayUser();
-    }
-
     private void loadUserData() {
-        getActivity().deleteDatabase(DatabaseHandler.DB_NAME);
-        db = new DatabaseHandler(getActivity());
 
+        db.deleteAllUsers();
+        mUserList.clear();
         Api api = new RestAdapter.Builder()
                 .setEndpoint(API_URL)
                 .build()
@@ -154,10 +170,11 @@ public class UserListFragment extends Fragment {
             @Override
             public void success(List<User> users, Response response) {
                 for (int i = 0; i < users.size(); i++) {
-                    mUser = users.get(i);
+                    User mUser = users.get(i);
                     db.addUser(mUser);
                 }
-                displayUser();
+                mUserList.addAll(db.getAllUsers());
+                myRecyclerAdapter.notifyDataSetChanged();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
 
@@ -168,32 +185,12 @@ public class UserListFragment extends Fragment {
         });
     }
 
+
     private void displayUser() {
-        mUserList = db.getAllUsers();
-        myRecyclerAdapter = new MyRecyclerAdapter(mUserList, R.layout.listviewlayout);
+
         mRecyclerView.setAdapter(myRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        myRecyclerAdapter.setOnItemClickListener(new MyRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                Intent intent = new Intent(fa.getApplicationContext(), EmployeeInfo.class);
-                intent.putExtra("User", position);
-                startActivity(intent);
-            }
-        });
-        myRecyclerAdapter.setOnItemLongClickListener(new MyRecyclerAdapter.OnItemLongClickListener() {
-            @Override
-            public void onItemLongClick(View v, int position) {
-                db.deleteUser(mUserList.get(position));
-                String userName = mUserList.get(position).getName();
-                myRecyclerAdapter.remove(mUserList.get(position));
-
-                notifyUserDeleted(userName);
-
-            }
-        });
-
     }
 
     private void notifyUserDeleted(String userName) {
@@ -206,5 +203,14 @@ public class UserListFragment extends Fragment {
         notificationManager.notify(1, builder.build());
     }
 
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==REQUEST_CODE){
+            if(resultCode==RESULT_OK){
+                mUserList.clear();
+                mUserList.addAll(db.getAllUsers());
+                myRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 }

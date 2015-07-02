@@ -77,6 +77,7 @@ public class EmployeeInfo extends AppCompatActivity {
             mUserList.remove(currentUserIndex);
             pageAdapter.notifyDataSetChanged();
             tabLayout.removeTabAt(currentUserIndex);
+            setResult(RESULT_OK);
             return true;
         }
         if(id == android.R.id.home) {

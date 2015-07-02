@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.splash);
 
 
-        StartAnimations();
+        //StartAnimations();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
