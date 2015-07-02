@@ -31,5 +31,6 @@
         android:src="@drawable/ic_add_white_36dp"
         app:elevation="6dp"
         app:layout_behavior="com.example.vidhipatel.myapplication.ScrollAwareFABBehavior"
-        app:pressedTranslationZ="12dp" />
+        app:pressedTranslationZ="12dp"
+        app:borderWidth="0dp"/>
 </android.support.design.widget.CoordinatorLayout>
