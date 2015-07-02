@@ -1,65 +1,55 @@
 package com.example.vidhipatel.myapplication;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 
 public class EmployeeInfo extends AppCompatActivity {
-    ViewPager viewPager;
-    myPageAdapter pageAdapter;
+    @Bind(R.id.pager) ViewPager viewPager;
+    MyPageAdapter pageAdapter;
     DatabaseHandler db;
     int currentUserIndex = 0;
     List<User> mUserList;
-    TabLayout tabLayout;
+    @Bind(R.id.empinfo_toolbar) Toolbar toolbar;
+    @Bind(R.id.tabs) TabLayout tabLayout;
+    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_info);
+        ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
         //Back button in actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //User mUser = (User) getIntent().getSerializableExtra("User");
+        collapsingToolbarLayout.setTitle("User Info");
+        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
+        collapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
+
         db = new DatabaseHandler(this);
         mUserList = db.getAllUsers();
         int pos = getIntent().getExtras().getInt("User");
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        pageAdapter = new myPageAdapter(this.getSupportFragmentManager());
+        pageAdapter = new MyPageAdapter(this.getSupportFragmentManager());
         viewPager.setAdapter(pageAdapter);
         viewPager.setCurrentItem(pos);
 
-  //      setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);    //MODE_SCROLLABLE=0
 
@@ -83,11 +73,11 @@ public class EmployeeInfo extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.delete) {
             currentUserIndex = viewPager.getCurrentItem();
-            // Log.i("DELETE", currentUserIndex + "- " + mUserList.get(currentUserIndex).getName());
             db.deleteUser(mUserList.get(currentUserIndex));
             mUserList.remove(currentUserIndex);
             pageAdapter.notifyDataSetChanged();
             tabLayout.removeTabAt(currentUserIndex);
+            setResult(RESULT_OK);
             return true;
         }
         if(id == android.R.id.home) {
@@ -97,17 +87,28 @@ public class EmployeeInfo extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        viewPager=null;
+        pageAdapter=null;
+        db=null;
+        mUserList=null;
+        toolbar=null;
+        tabLayout=null;
+        collapsingToolbarLayout=null;
+        finish();
 
-    public class myPageAdapter extends FragmentStatePagerAdapter {
+    }
 
-        public myPageAdapter(FragmentManager fm) {
+        class MyPageAdapter extends FragmentStatePagerAdapter {
+
+        public MyPageAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            //Log.i("POSITION", (position) + "- " + mUserList.get(position).getName());
-           // return mFragmentList.get(position);
             return EmployeeInfoFragment.newInstance(mUserList.get(position));
         }
 

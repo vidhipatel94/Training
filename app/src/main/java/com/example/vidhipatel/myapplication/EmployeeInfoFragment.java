@@ -12,21 +12,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 public class EmployeeInfoFragment extends Fragment {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     */
-    // TODO: Rename and change types and number of parameters
+    @Bind(R.id.empname) TextView textView;
+    @Bind(R.id.empdesignation) TextView textView2;
+    @Bind(R.id.empemail) TextView textView3;
+    public static String NAME="NAME";
+    public static String USERNAME="USERNAME";
+    public static String EMAIL="EMAIL";
+
     public static EmployeeInfoFragment newInstance(User mUser) {
         EmployeeInfoFragment fragment = new EmployeeInfoFragment();
         Bundle args = new Bundle();
-        args.putString("NAME", mUser.getName());
-        args.putString("USERNAME", mUser.getUsername());
-        args.putString("EMAIL", mUser.getEmail());
+        args.putString(NAME, mUser.getName());
+        args.putString(USERNAME, mUser.getUsername());
+        args.putString(EMAIL, mUser.getEmail());
         fragment.setArguments(args);
         return fragment;
     }
@@ -36,21 +40,13 @@ public class EmployeeInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v=inflater.inflate(R.layout.fragment_employee_info, container, false);
-        TextView textView = (TextView) v.findViewById(R.id.empname);
-        TextView textView2 = (TextView) v.findViewById(R.id.empdesignation);
-        TextView textView3 = (TextView) v.findViewById(R.id.empemail);
+        ButterKnife.bind(this,v);
 
-        textView.setText(getArguments().getString("NAME"));
-        textView2.setText(getArguments().getString("USERNAME"));
-        textView3.setText(getArguments().getString("EMAIL"));
+        textView.setText(getArguments().getString(NAME));
+        textView2.setText(getArguments().getString(USERNAME));
+        textView3.setText(getArguments().getString(EMAIL));
 
-    /*    ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
-
-        int imageWidth = bitmap.getWidth();
-        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, 800, true);
-        imageView.setImageBitmap(bitmap);
-    */    return v;
+        return v;
     }
 
 

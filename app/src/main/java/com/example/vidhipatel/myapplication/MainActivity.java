@@ -1,162 +1,265 @@
 package com.example.vidhipatel.myapplication;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.ListActivity;
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 
 public class MainActivity extends AppCompatActivity {
-    DrawerLayout drawerLayout;
-    Toolbar toolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @Bind(R.id.toolbar) Toolbar toolbar;
     ContentFragment fragment;
+    UserListFragment userListFragment;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-
-    ListView lv;
-    MyAdapterUser adapter1;
-    List<User> mUserList;
-    User mUser;
-    DatabaseHandler db;
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    Boolean isTablet=false;
+    public static final String MY_FRAG="MY_FRAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerLayout.openDrawer(GravityCompat.START);
+        if(drawerLayout==null)
+            isTablet=true;
 
         //actionbar
-        toolbar=(Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle("Users");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setVisibility(View.VISIBLE);
 
         //navigation button in actionbar
-        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
+        if(!isTablet) {
+            toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            });
+        }
 
         //navigation
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
         view.getMenu().getItem(2).setChecked(true); //by default select Users
         fragment = new ContentFragment();
+        userListFragment = new UserListFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame, userListFragment, MY_FRAG);
+        fragmentTransaction.commit();
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                 menuItem.setChecked(true);
+                menuItem.setChecked(true);
                 switch (menuItem.getItemId()) {
 
                     case R.id.navigation_home:
-                        if(fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.replace(R.id.content_frame, fragment).commit();
-                        }
-                        Toast.makeText(getApplicationContext(), menuItem.getTitle(),Toast.LENGTH_LONG).show();
-                        break;
+
                     case R.id.navigation_message:
-                        if(fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.replace(R.id.content_frame, fragment).commit();
+                        android.support.v4.app.Fragment myFragment1 =
+                                (android.support.v4.app.Fragment) getSupportFragmentManager().findFragmentByTag(MY_FRAG);
+                        if (myFragment1 != null && !myFragment1.equals(fragment)) {
+                            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(myFragment1.getId(), fragment, MY_FRAG);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                         }
-                        Toast.makeText(getApplicationContext(), menuItem.getTitle(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), menuItem.getTitle(), Toast.LENGTH_LONG).show();
                         break;
                     default:
-                        if(!fragmentTransaction.isEmpty()) {
-                            fragmentTransaction.remove(fragment).commit();
+                        android.support.v4.app.Fragment myFragment2 =
+                                (android.support.v4.app.Fragment) getSupportFragmentManager().findFragmentByTag(MY_FRAG);
+                        if (myFragment2 != null && !myFragment2.equals(userListFragment)) {
+                            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(myFragment2.getId(), userListFragment, MY_FRAG);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                         }
                 }
-
-                drawerLayout.closeDrawers();
+                if (!isTablet)
+                    drawerLayout.closeDrawers();
 
                 return true;
             }
         });
 
-        mUserList = new ArrayList<User>();
-        lv = (ListView) findViewById(R.id.list);
 
-        loadUserData();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.accent_material_light);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadUserData();
-            }
-        });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addUser();
-            }
-        });
+        //stackusage();
+       // Log.i("Collection", "--------------------");
+        //collectionusage();
+        //Log.i("List", "------------------------------");
+       // listusage();
 
     }
+
+    private void listusage() {
+        MyList<String> list=new MyList<String>();
+        list.add("AA");
+        Log.i("SIZE", list.size() + "");
+        Log.i("0:", list.get(0));
+        //add
+        list.add(1, "BB");
+        Log.i("SIZE", list.size() + "");
+        Log.i("1:", list.get(1));
+        list.add(1, "CC");
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("SIZE", list.size() + "");
+
+        MyCollection<String> myCollection=new MyCollection<String>();
+        myCollection.add("11");
+        myCollection.add("22");
+
+        //addAll
+        list.addAll(1, myCollection);
+        Log.i("SIZE", list.size() + "");
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("3:", list.get(3));
+
+        //index
+        list.add("CC");
+        Log.i("Index:CC", list.indexOf("CC") + "");
+        Log.i("LastIndex:CC", list.lastIndexOf("CC") + "");
+
+        //remove
+        Log.i("SIZE", list.size() + "");
+        list.remove(2);
+        Log.i("SIZE", list.size() + "");
+        Log.i("0:", list.get(0));
+        Log.i("1:", list.get(1));
+        Log.i("2:", list.get(2));
+        Log.i("3:", list.get(3));
+        Log.i("4:", list.get(4));
+
+        //set
+        list.set(1, "VV");
+        Log.i("1:", list.get(1));
+
+        //sublist
+        List<String> sublist=list.subList(1,4);
+        for(int i=0;i<sublist.size();i++)
+            Log.i(i+":",sublist.get(i));
+
+        //iterator
+        ListIterator<String> iterator= list.listIterator();
+        while(iterator.hasNext()){
+            String s=iterator.next();
+            if(s=="VV")
+                iterator.set("11");
+
+            Log.i("ELE-N",s);
+        }
+        while(iterator.hasPrevious())
+            Log.i("ELE-P",iterator.previous());
+
+        iterator= list.listIterator(1);
+        while(iterator.hasNext()){
+            Log.i("ELE-N",iterator.next());
+        }
+        while(iterator.hasPrevious())
+            Log.i("ELE-P",iterator.previous());
+
+    }
+
+
+    private void collectionusage() {
+        MyCollection<String> myCollection = new MyCollection<String>();
+        Log.i("SIZE", myCollection.size() + "");
+        myCollection.add("AA");
+        myCollection.add("BB");
+        Log.i("SIZE", myCollection.size() + "");
+        Log.i("BB?", myCollection.contains("BB") + "");
+        myCollection.remove("BB");
+        Log.i("BB?", myCollection.contains("BB") + "");
+        myCollection.add("BB");
+        myCollection.add("CC");
+        myCollection.add("DD");
+        Log.i("EMPTY?", myCollection.isEmpty() + "");
+        Log.i("SIZE", myCollection.size() + "");
+        //myCollection.clear();
+        //Log.i("EMPTY?", myCollection.isEmpty() + "");
+
+        MyCollection<String> myCollection1=new MyCollection<String>();
+        myCollection1.addAll(myCollection);
+        Log.i("SIZE", myCollection1.size() + "");
+        Log.i("CONTAINSALL",myCollection1.containsAll(myCollection)+"");
+        Iterator<String> iterator= (Iterator<String>) myCollection1.iterator();
+        while(iterator.hasNext()){
+            Log.i("ELE",iterator.next());
+        }
+        myCollection.remove("CC");//AA BB DD
+        myCollection1.removeAll(myCollection); //CC
+        Log.i("SIZE", myCollection1.size() + "");
+
+        iterator= (Iterator<String>) myCollection1.iterator();
+        while(iterator.hasNext()){
+            Log.i("ELE",iterator.next());
+        }
+
+        //retainAll
+        Log.i("C", "----------");
+        myCollection.add("CC");
+        iterator= (Iterator<String>) myCollection.iterator();
+        while(iterator.hasNext()){
+            Log.i("ELE",iterator.next());
+        }
+        myCollection.retainAll(myCollection1);
+        Log.i("", "---Retain--");
+        iterator= (Iterator<String>) myCollection.iterator();
+        while(iterator.hasNext()){
+            Log.i("ELE",iterator.next());
+        }
+
+        myCollection.add("BB");
+        myCollection.add("AA");
+        myCollection.add("DD");
+
+        String[] s=myCollection.toArray(new String[5]);
+        Log.i("","Length" + s.length);
+
+        Object[] o=myCollection.toArray();
+        Log.i("","Length" + o.length);
+    }
+
+    private void stackusage() {
+        Stack<String> stack=new ArrayStack<String>();
+        stack.push("AA");
+        stack.push("BB");
+        stack.push("DD");
+        stack.push("EE");
+        Log.i("TOS", "stack size:" + stack.tos());
+        Log.i("POP", stack.pop());
+        Log.i("POP", stack.pop());
+        Log.i("TOS", "stack size:"+stack.tos());
+       // Log.i("POP", stack.pop());
+        stack.push("CC");
+        Log.i("TOS", "stack size:" + stack.tos());
+        stack.clear();
+        Log.i("TOS", "stack size:" + stack.tos());
+    }
+
 
     @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        displayUser();
-    }
-
-        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -185,94 +288,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadUserData() {
-        this.deleteDatabase("userdb");
-        db = new DatabaseHandler(this);
-
-        Api api = new RestAdapter.Builder()
-                .setEndpoint("http://jsonplaceholder.typicode.com")
-                .build()
-                .create(Api.class);
-        api.getUser(new Callback<List<User>>() {
-            @Override
-            public void success(List<User> users, Response response) {
-                // Log.i("JSON",users.get(0).getAddress());
-                for (int i = 0; i < users.size(); i++) {
-                    mUser = users.get(i);
-                    //mUserList.add(mUser);
-                    db.addUser(mUser);
-                }
-                displayUser();
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_LONG).show();
-             /*   mUser = new User();
-                mUser.setId(mUserList.size() + 1);
-                mUser.setName("Vidhi Patel");
-                mUser.setUsername("vidhi");
-                mUser.setEmail("vidhi@xyz.com");
-                mUserList.add(mUser);
-                db.addUser(mUser);
-
-                mUser = new User();
-                mUser.setId(mUserList.size() + 1);
-                mUser.setName("Radhi Patel");
-                mUser.setUsername("vidhi");
-                mUser.setEmail("vidhi@xyz.com");
-                mUserList.add(mUser);
-                db.addUser(mUser);
-                displayUser();
-                */
-            }
-        });
-    }
-
-    private void displayUser() {
-        mUserList = db.getAllUsers();
-        adapter1 =
-                new MyAdapterUser(this, mUserList);
-        lv.setAdapter(adapter1);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                // ListView Clicked item value
-              //  User itemValue = (User) lv.getItemAtPosition(position);
-
-                Intent intent = new Intent(getApplicationContext(), EmployeeInfo.class);
-                //intent.putExtra("User", itemValue);
-                intent.putExtra("User", position);
-                startActivity(intent);
-
-            }
-
-        });
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                db.deleteUser(mUserList.get(position));
-                mUserList.remove(position);
-                adapter1.notifyDataSetChanged();
-                return true;
-            }
-        });
-    }
-
-    private void addUser() {
-        mUser = new User();
-        mUser.setId(mUserList.size() + 1);
-        mUser.setName("Vidhi Patel");
-        mUser.setUsername("vidhi");
-        mUser.setEmail("vidhi@xyz.com");
-        mUserList.add(mUser);
-        adapter1.notifyDataSetChanged();
-        db.addUser(mUser);
-        Toast.makeText(getApplicationContext(), "User is added ", Toast.LENGTH_LONG).show();
-    }
 
 }
